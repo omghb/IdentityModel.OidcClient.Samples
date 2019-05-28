@@ -69,7 +69,7 @@ namespace UwpSample
                 ClientId = "native.hybrid",
                 Scope = "openid profile api offline_access",
                 RedirectUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri,
-
+                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
                 Browser = new WabBrowser(enableWindowsAuthentication: false)
             };
 
@@ -115,6 +115,23 @@ namespace UwpSample
             {
                 ResultTextBox.Text = result.ReasonPhrase;
             }
+        }
+
+        private async void LogoutWabButton_Click(object sender, RoutedEventArgs e)
+        {
+            var options = new OidcClientOptions
+            {
+                Authority = "https://demo.identityserver.io",
+                ClientId = "native.hybrid",
+                Scope = "openid profile api offline_access",
+                RedirectUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri,
+                PostLogoutRedirectUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri,
+                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
+                Browser = new WabBrowser(enableWindowsAuthentication: false)
+            };
+
+            var client = new OidcClient(options);
+            await client.LogoutAsync(new LogoutRequest());
         }
     }
 }
