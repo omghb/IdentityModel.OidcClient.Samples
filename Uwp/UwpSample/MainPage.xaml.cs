@@ -1,4 +1,5 @@
 ﻿using IdentityModel.OidcClient;
+using IdentityModel.OidcClient.Browser;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Net.Http;
@@ -16,6 +17,7 @@ namespace UwpSample
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        LoginResult _result;
         HttpClient _client;
 
         public MainPage()
@@ -57,6 +59,7 @@ namespace UwpSample
 
             ResultTextBox.Text = sb.ToString();
 
+            _result = result;
             _client = new HttpClient(result.RefreshTokenHandler);
             _client.BaseAddress = new Uri("https://demo.identityserver.io/");
         }
@@ -94,6 +97,7 @@ namespace UwpSample
             
             ResultTextBox.Text = sb.ToString();
 
+            _result = result;
             _client = new HttpClient(result.RefreshTokenHandler);
             _client.BaseAddress = new Uri("https://demo.identityserver.io/");
         }
@@ -131,7 +135,18 @@ namespace UwpSample
             };
 
             var client = new OidcClient(options);
-            await client.LogoutAsync(new LogoutRequest());
+            try
+            {
+                await client.LogoutAsync(new LogoutRequest()
+                {
+                    BrowserDisplayMode = DisplayMode.Hidden,
+                    IdTokenHint = _result.IdentityToken
+                });
+            }
+            catch (Exception ex)
+            {
+                // TODO: This is never called: See https://github.com/IdentityModel/IdentityModel.OidcClient2/issues/123
+            }
         }
     }
 }
